@@ -9,6 +9,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors"
 	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors/languages"
+	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors/frameworks"
+	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors/servers"
 	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors/info"
 )
 
@@ -37,11 +39,22 @@ func main() {
 		detector.Detect()
 	}
 
-	php := languages.PHP{&detector}
-	php.Detect()
+	frameworkDetectors := [1]detectors.DetectorInterface{&frameworks.Default{&detector}}
+	for _, detector := range frameworkDetectors {
+		detector.Detect()
+	}
 
+	serverDetectors := [2]detectors.DetectorInterface{&servers.Apache{&detector}, &servers.Nginx{&detector}}
+	for _, detector := range serverDetectors {
+		detector.Detect()
+	}
+
+	fmt.Println("Server Name:", info.Server.Name);
+	fmt.Println("Server Version:", info.Server.Version);
 	fmt.Println("Language Name:", info.Language.Name);
 	fmt.Println("Language Version:", info.Language.Version);
+	fmt.Println("Framework Name:", info.Framework.Name);
+	fmt.Println("Framework Version:", info.Framework.Version);
 
 	/*
 	doc.Find("div").Each(func(i int, s *goquery.Selection) {

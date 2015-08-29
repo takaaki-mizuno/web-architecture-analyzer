@@ -8,7 +8,6 @@ import (
 
 type DetectorInterface interface{
 	Detect() bool
-	Message() string
 }
 
 type Detector struct {

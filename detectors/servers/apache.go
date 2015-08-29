@@ -1,4 +1,4 @@
-package languages
+package servers
 
 import (
 	"strings"
@@ -6,19 +6,19 @@ import (
 	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors"
 )
 
-type PHP struct {
+type Apache struct {
 	*detectors.Detector
 }
 
-func (detector *PHP) Detect() bool {
+func (detector *Apache) Detect() bool {
 	for key, values := range detector.Response.Header {
-		if strings.ToLower(key) == "x-powered-by" {
+		if strings.ToLower(key) == "server" {
 			for _, value := range values {
-				regex := regexp.MustCompile(`PHP/([\d.]+)`)
+				regex := regexp.MustCompile(`Apache`)
 				result := regex.FindStringSubmatch(value)
-				if len(result) > 1 {
-					detector.Info.Language.Name = "PHP"
-					detector.Info.Language.Version = result[1]
+				if len(result) > 0 {
+					detector.Info.Server.Name = "Apache"
+					detector.Info.Server.Version = ""
 					return true
 				}
 			}
