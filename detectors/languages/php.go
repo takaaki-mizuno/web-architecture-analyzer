@@ -21,6 +21,13 @@ func (detector *PHP) Detect() bool {
 					detector.Info.Language.Version = result[1]
 					return true
 				}
+				regex = regexp.MustCompile(`HHVM/([\d.]+)`)
+				result = regex.FindStringSubmatch(value)
+				if len(result) > 1 {
+					detector.Info.Language.Name = "HHVM"
+					detector.Info.Language.Version = result[1]
+					return true
+				}
 			}
 		}
 	}

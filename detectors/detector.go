@@ -3,7 +3,7 @@ package detectors
 import (
 	"net/http"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/takaaki-mizuno/web-architecture-analyzer/detectors/info"
+	"github.com/takaaki-mizuno/web-architecture-analyzer/info"
 )
 
 type DetectorInterface interface{
