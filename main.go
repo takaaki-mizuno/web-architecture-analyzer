@@ -63,8 +63,9 @@ func detect(url string) info.Info {
 		}
 	}
 
-	frameworkDetectors := [7]detectors.DetectorInterface{
+	frameworkDetectors := [8]detectors.DetectorInterface{
 		&frameworks.Laravel{&detector}, &frameworks.CakePHP{&detector}, &frameworks.Play{&detector},
+		&frameworks.FuelPHP{&detector},
 		&frameworks.JBoss{&detector}, &frameworks.Servlet{&detector}, &frameworks.Rails{&detector},
 		&frameworks.Default{&detector}}
 	for _, detector := range frameworkDetectors {

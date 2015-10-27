@@ -31,5 +31,9 @@ func (detector *PHP) Detect() bool {
 			}
 		}
 	}
+	if _, ok := detector.Info.Cookies["PHPSESSID"]; ok {
+		detector.Info.Language.Name = "PHP"
+		return true
+	}
 	return false
 }
