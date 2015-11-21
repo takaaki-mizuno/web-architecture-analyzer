@@ -55,7 +55,8 @@ func detect(url string) info.Info {
 
 	detector := detectors.Detector{response, doc, &info}
 
-	languageDetectors := [2]detectors.DetectorInterface{&languages.PHP{&detector}, &languages.Python{&detector}}
+	languageDetectors := [3]detectors.DetectorInterface{
+		&languages.PHP{&detector}, &languages.Python{&detector}, &languages.Ruby{&detector}}
 	for _, detector := range languageDetectors {
 		result := detector.Detect()
 		if result == true {
