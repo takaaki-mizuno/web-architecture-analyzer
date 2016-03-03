@@ -64,10 +64,10 @@ func detect(url string) info.Info {
 		}
 	}
 
-	frameworkDetectors := [8]detectors.DetectorInterface{
+	frameworkDetectors := [9]detectors.DetectorInterface{
 		&frameworks.Laravel{&detector}, &frameworks.CakePHP{&detector}, &frameworks.Play{&detector},
-		&frameworks.FuelPHP{&detector},
-		&frameworks.JBoss{&detector}, &frameworks.Servlet{&detector}, &frameworks.Rails{&detector},
+		&frameworks.FuelPHP{&detector}, &frameworks.Codeigniter{&detector},
+        &frameworks.JBoss{&detector}, &frameworks.Servlet{&detector}, &frameworks.Rails{&detector},
 		&frameworks.Default{&detector}}
 	for _, detector := range frameworkDetectors {
 		result := detector.Detect()
