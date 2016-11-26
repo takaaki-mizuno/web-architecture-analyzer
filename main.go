@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"time"
 	"os"
 	"fmt"
 	"strings"
@@ -110,8 +109,8 @@ func buildUI(info info.Info) {
 	urlLabel := ui.NewPar(fmt.Sprintf("%s", info.Url))
 	urlLabel.Height = 3
 	urlLabel.TextFgColor = ui.ColorWhite
-	urlLabel.Border.Label = "URL"
-	urlLabel.Border.FgColor = ui.ColorCyan
+	urlLabel.BorderLabel = "URL"
+	urlLabel.BorderFg = ui.ColorCyan
 
 	basicInfoStrings := []string{
 		fmt.Sprintf("IP: %s", strings.Join(info.Ip, ",")),
@@ -122,7 +121,7 @@ func buildUI(info info.Info) {
 	basicInfoList := ui.NewList()
 	basicInfoList.Items = basicInfoStrings
 	basicInfoList.ItemFgColor = ui.ColorYellow
-	basicInfoList.Border.Label = "BasicInfo"
+	basicInfoList.BorderLabel = "BasicInfo"
 	basicInfoList.Height = 15
 	basicInfoList.Width = 25
 	basicInfoList.Y = 0
@@ -130,32 +129,32 @@ func buildUI(info info.Info) {
 	serverLabel := ui.NewPar(fmt.Sprintf("Name: %s\nVersion: %s", info.Server.Name, info.Server.Version))
 	serverLabel.Height = 4
 	serverLabel.TextFgColor = ui.ColorWhite
-	serverLabel.Border.Label = "Server"
-	serverLabel.Border.FgColor = ui.ColorCyan
+	serverLabel.BorderLabel = "Server"
+	serverLabel.BorderFg = ui.ColorCyan
 
 	languageLabel := ui.NewPar(fmt.Sprintf("Name: %s\nVersion: %s", info.Language.Name, info.Language.Version))
 	languageLabel.Height = 4
 	languageLabel.TextFgColor = ui.ColorWhite
-	languageLabel.Border.Label = "Language"
-	languageLabel.Border.FgColor = ui.ColorCyan
+	languageLabel.BorderLabel = "Language"
+	languageLabel.BorderFg = ui.ColorCyan
 
 	frameworkLabel := ui.NewPar(fmt.Sprintf("Name: %s\nVersion: %s", info.Framework.Name, info.Framework.Version))
 	frameworkLabel.Height = 4
 	frameworkLabel.TextFgColor = ui.ColorWhite
-	frameworkLabel.Border.Label = "Framework"
-	frameworkLabel.Border.FgColor = ui.ColorCyan
+	frameworkLabel.BorderLabel = "Framework"
+	frameworkLabel.BorderFg = ui.ColorCyan
 
 	packageLabel := ui.NewPar(fmt.Sprintf("Name: %s\nVersion: %s", info.Package.Name, info.Package.Version))
 	packageLabel.Height = 4
 	packageLabel.TextFgColor = ui.ColorWhite
-	packageLabel.Border.Label = "Package"
-	packageLabel.Border.FgColor = ui.ColorCyan
+	packageLabel.BorderLabel = "Package"
+	packageLabel.BorderFg = ui.ColorCyan
 
 	ispLabel := ui.NewPar(fmt.Sprintf("Name: %s\nRegion: %s", info.ISP.Name, info.ISP.Region))
 	ispLabel.Height = 4
 	ispLabel.TextFgColor = ui.ColorWhite
-	ispLabel.Border.Label = "ISP"
-	ispLabel.Border.FgColor = ui.ColorCyan
+	ispLabel.BorderLabel = "ISP"
+	ispLabel.BorderFg = ui.ColorCyan
 
 	var headerStrings []string
 	for key, values := range info.RawHeaders {
@@ -165,7 +164,7 @@ func buildUI(info info.Info) {
 	headerList := ui.NewList()
 	headerList.Items = headerStrings
 	headerList.ItemFgColor = ui.ColorYellow
-	headerList.Border.Label = "Raw Headers"
+	headerList.BorderLabel = "Raw Headers"
 	headerList.Height = 25
 	headerList.Y = 0
 
@@ -177,7 +176,7 @@ func buildUI(info info.Info) {
 	cookieList := ui.NewList()
 	cookieList.Items = cookieStrings
 	cookieList.ItemFgColor = ui.ColorYellow
-	cookieList.Border.Label = "Cookies"
+	cookieList.BorderLabel = "Cookies"
 	cookieList.Height = 25
 	cookieList.Y = 0
 
@@ -209,17 +208,17 @@ func buildUI(info info.Info) {
 
 	sp := ui.NewSparklines(spark)
 	sp.Height = 15
-	sp.Border.Label = "Sparkline"
+	sp.BorderLabel = "Sparkline"
 
 	g1 := ui.NewGauge()
 	g1.Percent = 30
 	g1.Height = 4
 	g1.Y = 6
-	g1.Border.Label = "Progress"
+	g1.BorderLabel = "Progress"
 	g1.PercentColor = ui.ColorYellow
 	g1.BarColor = ui.ColorGreen
-	g1.Border.FgColor = ui.ColorWhite
-	g1.Border.LabelFgColor = ui.ColorMagenta
+	g1.BorderFg = ui.ColorWhite
+	g1.BorderLabelFg = ui.ColorMagenta
 
 	ui.Body.AddRows(
 		ui.NewRow(
@@ -246,40 +245,25 @@ func buildUI(info info.Info) {
 	)
 	ui.Body.Align()
 
-	done := make(chan bool)
-	redraw := make(chan bool)
+    ui.Render(ui.Body)
 
-	update := func() {
-		for i := 0; i < 103; i++ {
-			g1.Percent = (g1.Percent + 3) % 100
-			sp.Lines[0].Data = spdata[:100+i]
+//	redraw := make(chan bool)
 
-			time.Sleep(time.Second / 2)
-			redraw <- true
-		}
-		done <- true
-	}
+    ui.Handle("/sys/kbd/q", func(ui.Event) {
+        // press q to quit
+        ui.StopLoop()
+    })
 
-	evt := ui.EventCh()
+    ui.Handle("/sys/wnd/resize", func(ui.Event) {
+        // press q to quit
+        ui.Body.Width = ui.TermWidth()
+        ui.Body.Align()
+    })
 
-	ui.Render(ui.Body)
-	go update()
 
-	for {
-		select {
-		case e := <-evt:
-			if e.Type == ui.EventKey && e.Ch == 'q' {
-				return
-			}
-			if e.Type == ui.EventResize {
-				ui.Body.Width = ui.TermWidth()
-				ui.Body.Align()
-				go func() { redraw <- true }()
-			}
-		case <-done:
-			return
-		case <-redraw:
-			ui.Render(ui.Body)
-		}
-	}
+    ui.Handle("/timer/1s", func(e ui.Event) {
+        ui.Body.Align()
+    })
+
+    ui.Loop()
 }
